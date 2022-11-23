@@ -39,14 +39,14 @@ _start:                     ; this is where code starts getting executed
     mov rsi, O_RDONLY
     mov rdx, 0
     syscall
-  ; read the file contents
+  ; read the file
     mov rdi, rax ; file descriptor
     mov rsi, bufer ; buffer
     mov rdx, bufsize ; buffer size
     mov rax, SYS_read ; read
     syscall
 
-  ; write to STDOUT (Standard Output)
+  ; write to STDOUT
     mov rdi, STDOUT ; file descriptor
     mov rsi, bufer ; buffer
     mov rdx, rax ; buffer size

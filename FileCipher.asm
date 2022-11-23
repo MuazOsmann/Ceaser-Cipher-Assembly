@@ -33,27 +33,27 @@ section .bss
 section  .text              ; declaring our .text segment
   global  _start  
 _start:                     ; this is where code starts getting executed
-  ; get the filename in ebx
-    mov ebx, FileName
-
   ; open the file
-    mov eax, SYS_open
-    mov ecx, O_RDONLY
-    int 0x80               ; );
-
+    mov rax, SYS_open ; file open
+    mov rdi, FileName ; file name string
+    mov rsi, O_RDONLY
+    mov rdx, 0
+    syscall
   ; read the file
-    mov eax, SYS_read
-    mov ebx, eax       ;   file_descriptor,
-    mov ecx, bufer       ;   *buf,
-    mov edx, bufsize   ;   *bufsize
-    int 0x80             ; );
+    mov rdi, rax ; file descriptor
+    mov rsi, bufer ; buffer
+    mov rdx, bufsize ; buffer size
+    mov rax, SYS_read ; read
+    syscall
 
   ; write to STDOUT
-    mov eax, SYS_write
-    mov ebx, STDOUT
-    int 0x80             ; );
+    mov rdi, STDOUT ; file descriptor
+    mov rsi, bufer ; buffer
+    mov rdx, rax ; buffer size
+    mov rax, SYS_write ; write
+    syscall
 
   ; exit
-    mov   eax, SYS_exit
-    mov   ebx, EXIT_SUCCESS
-    int   0x80               ; );
+    mov rax, SYS_exit ; exit
+    mov rdi, EXIT_SUCCESS ; exit code
+    syscall

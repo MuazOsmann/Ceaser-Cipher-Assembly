@@ -39,12 +39,26 @@ _start:                     ; this is where code starts getting executed
     mov rsi, O_RDONLY
     mov rdx, 0
     syscall
+
   ; read the file
     mov rdi, rax ; file descriptor
     mov rsi, bufer ; buffer
     mov rdx, bufsize ; buffer size
     mov rax, SYS_read ; read
     syscall
+
+   ; CIPHER CODE
+        ; TRAVERSE THE CONTENT OF THE FILE
+        ; FIRST CHECK IF END OF FILE
+        ; CHECK IF ELEMENT IS A LETTER -> RANGE OF LETTERS IN ASSCI
+        ; CAPITAL LETTERS RANGE A (65) TO Z (90)
+        ; USING ASCI
+        ; WE CHECK IF X Y Z
+        ; IF X SHIFT TO A       X = 88 TO A = 65
+        ; IF Y SHIFT TO B       Y = 89 TO B = 66
+        ; IF Z SHIFT TO C       Z = 90 TO C = 67
+        ; ELSE
+        ; SHIFT EVERY ELEMENT BY 3
 
   ; write to STDOUT
     mov rdi, STDOUT ; file descriptor

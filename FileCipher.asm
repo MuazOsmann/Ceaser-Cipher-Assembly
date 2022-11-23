@@ -33,20 +33,20 @@ section .bss
 section  .text              ; declaring our .text segment
   global  _start  
 _start:                     ; this is where code starts getting executed
-  ; open the file
+  ; open the file 
     mov rax, SYS_open ; file open
     mov rdi, FileName ; file name string
     mov rsi, O_RDONLY
     mov rdx, 0
     syscall
-  ; read the file
+  ; read the file contents
     mov rdi, rax ; file descriptor
     mov rsi, bufer ; buffer
     mov rdx, bufsize ; buffer size
     mov rax, SYS_read ; read
     syscall
 
-  ; write to STDOUT
+  ; write to STDOUT (Standard Output)
     mov rdi, STDOUT ; file descriptor
     mov rsi, bufer ; buffer
     mov rdx, rax ; buffer size

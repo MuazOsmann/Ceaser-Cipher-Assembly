@@ -28,6 +28,7 @@ S_IXUSR equ 00100q
 section .data
   bufsize dw 1024
   FileName db "msg.txt",0
+  ResultFile db "result.txt",0
 section .bss
   bufer resb 1024
 section  .text              ; declaring our .text segment
@@ -36,7 +37,7 @@ _start:                     ; this is where code starts getting executed
   ; open the file
     mov rax, SYS_open ; file open
     mov rdi, FileName ; file name string
-    mov rsi, O_RDONLY
+    mov rsi, O_RDWR
     mov rdx, 0
     syscall
 
@@ -59,14 +60,77 @@ _start:                     ; this is where code starts getting executed
         ; IF Z SHIFT TO C       Z = 90 TO C = 67
         ; ELSE
         ; SHIFT EVERY ELEMENT BY 3
-
-  ; write to STDOUT
+        
+        ; write to STDOUT
+    mov rdi, STDOUT ; file descriptor
+    mov rsi, bufer ; buffer
+    mov rdx, rax ; buffer size
+    mov rax, SYS_write ; write
+    syscall  
+  ; Take Every Letter ASCII value and add 3 to it
+  ; if the value is greater than 90 then subtract 26
+  ; if the value is less than 65 then add 26
+  ShiftingLoop:
+  ; check if the end of file
+    cmp byte [rsi], NULL
+    je EndOfLoop
+  ; check if the element is a letter
+    cmp byte [rsi], 65 ; This is ASCII value of A
+    jl NotALetter
+    cmp byte [rsi], 90 ; This is ASCII value of Z
+    jg NotALetter
+  ; check if the element is X Y Z
+    cmp byte [rsi], 88 ; This is ASCII value of X
+    je X
+    cmp byte [rsi], 89 ; This is ASCII value of Y
+    je Y
+    cmp byte [rsi], 90 ; This is ASCII value of Z
+    je Z
+  ; else shift the element by 3
+    add byte [rsi], 3 ; add 3 to the element
+    jmp NextElement
+  ; if the element is X
+  X:
+    mov byte [rsi], 65 ; change the element to A
+    jmp NextElement
+  ; if the element is Y
+  Y:
+    mov byte [rsi], 66 ; change the element to B
+    jmp NextElement
+  ; if the element is Z
+  Z:
+    mov byte [rsi], 67 ; change the element to C
+    jmp NextElement
+  ; if the element is not a letter
+  NotALetter:
+    mov byte [rsi], 32 ; change the element to space
+  ; go to the next element
+  NextElement:
+    inc rsi ; increment the pointer
+    jmp ShiftingLoop ; go to the loop
+  ; end of loop
+  EndOfLoop:
+    ; write to STDOUT
     mov rdi, STDOUT ; file descriptor
     mov rsi, bufer ; buffer
     mov rdx, rax ; buffer size
     mov rax, SYS_write ; write
     syscall
-
+  ; open the file
+    mov rax, SYS_open ; file open
+    mov rdi, ResultFile ; file name string
+    mov rsi, O_CREAT | O_TRUNC | O_WRONLY ; flags
+    mov rdx, S_IRUSR | S_IWUSR ; mode
+    syscall
+  ; write to the file
+    mov rdi, rax ; file descriptor
+    mov rsi, bufer ; buffer
+    mov rax, SYS_write ; write
+    syscall
+  ; close the file
+    mov rdi, rax ; file descriptor
+    mov rax, SYS_close ; close
+    syscall
   ; exit
     mov rax, SYS_exit ; exit
     mov rdi, EXIT_SUCCESS ; exit code

@@ -1,2 +1,1 @@
-this is a test message
-second line.
+THIS IS A TEST

@@ -114,7 +114,8 @@ _start:                     ; this is where code starts getting executed
   Swapping:
     mov rsi, bufer ; set the pointer to the beginning of the buffer
     ; Swap between the current letter and the next lettermov rsi, buffer ; set the pointer to the beginning of the buffer
-    call swap ; calling the swap function to swap between paramteres
+    call odd_even_swap ; calling the swap function to swap between odds and even
+    call swap_all    ; calling the swap_all function : swaps every 2 elements together
 
   EndOfLoop:
     ; Line Feed
@@ -176,8 +177,8 @@ PrintingDone:
   pop rbp
   ret
 
-global swap
-swap:
+global odd_even_swap
+odd_even_swap:
     SwapLoop:
     ; check if the end of file
       cmp byte [rsi+1], NULL
@@ -190,5 +191,22 @@ swap:
       mov [rsi], bl ; move bl to the current letter
       mov [rsi+1], al ; move al to the next letter
       add rsi, 2 ; increment the pointer by 2
+      jmp SwapLoop
+ret
+
+global swap_all
+swap_all:
+    SwapLoop:
+    ; check if the end of file
+      cmp byte [rsi+1], NULL
+      jne .notDone
+      ret
+    .notDone:
+    ; swap the current letter with the next letter
+      mov al, [rsi] ; move the current letter to al
+      mov bl, [rsi+1] ; move the next letter to bl
+      mov [rsi], bl ; move bl to the current letter
+      mov [rsi+1], al ; move al to the next letter
+      inc rsi
       jmp SwapLoop
 ret

@@ -116,6 +116,7 @@ _start:                     ; this is where code starts getting executed
     mov rsi, bufer ; set the pointer to the beginning of the buffer
     ; Swap between the current letter and the next lettermov rsi, buffer ; set the pointer to the beginning of the buffer
     call odd_even_swap ; calling the swap function to swap between odds and even
+    mov rsi, bufer ; set the pointer to the beginning of the buffer
     call swap_all    ; calling the swap_all function : swaps every 2 elements together
 
   EndOfLoop:

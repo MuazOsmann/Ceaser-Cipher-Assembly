@@ -26,47 +26,28 @@ S_IWUSR equ 00200q
 S_IXUSR equ 00100q
 
 section .data
-  bufsize dw 1024   ; number of characters read from the file
-  FileName db "msg.txt", NULL   ; name of the file to be read, NULL FOR END OF STRING
-  ResultFile db "result.txt", NULL  ; name of the file to written in, NULL FOR END OF STRING
+  bufsize dw 1024
+  FileName db "msg.txt",0
+  ResultFile db "result.txt",0
 section .bss
-  bufer resb 1024   ; TO STORE THE TEXT READ FROM THE FILE
-  CipheredText resb 1024    ;   TO STORE THE CIPHER TEXT
+  bufer resb 1024
+  CipheredText resb 1024
 section  .text              ; declaring our .text segment
   global  _start  
 _start:                     ; this is where code starts getting executed
   ; open the file
     mov rax, SYS_open ; file open
     mov rdi, FileName ; file name string
-    mov rsi, O_RDWR   ; read and write permissions
-    syscall           ; to call the open file
-
-    ; TO DO
-    ; COMPARE if rax < 0
-    ; IF TRUE JUMP TO OPEN FILE ERROR LABEL
-    ; mov  qword readBuffer[], rax
+    mov rsi, O_RDWR
+    mov rdx, 0
+    syscall
 
   ; read the file
-    mov rax, SYS_read ; read
     mov rdi, rax ; file descriptor
-    mov rsi, bufer ; buffer - content of file stored in rsi
-    mov rdx, bufsize ; buffer size
-    syscall
-
-    ; TO DO
-    ; COMPARE if rax < 0
-    ; IF TRUE JUMP TO READ FILE ERROR LABEL
-
-        ; write content of file to STDOUT
-    mov rax, SYS_write ; write
-    mov rdi, STDOUT ; file descriptor
     mov rsi, bufer ; buffer
-    mov rdx, rax ; buffer size
+    mov rdx, bufsize ; buffer size
+    mov rax, SYS_read ; read
     syscall
-
-  ; Take Every Letter ASCII value and add 3 to it
-  ; if the value is greater than 90 then subtract 26
-  ; if the value is less than 65 then add 26
 
    ; CIPHER CODE
         ; TRAVERSE THE CONTENT OF THE FILE
@@ -80,15 +61,25 @@ _start:                     ; this is where code starts getting executed
         ; IF Z SHIFT TO C       Z = 90 TO C = 67
         ; ELSE
         ; SHIFT EVERY ELEMENT BY 3
+        
+        ; write to STDOUT
+    mov rdi, STDOUT ; file descriptor
+    mov rsi, bufer ; buffer
+    mov rdx, rax ; buffer size
+    mov rax, SYS_write ; write
+    syscall  
+  ; Take Every Letter ASCII value and add 3 to it
+  ; if the value is greater than 90 then subtract 26
+  ; if the value is less than 65 then add 26
 
   ShiftingLoop:
   ; check if the end of file proceed to the Swapping part
     cmp byte [rsi], NULL
     je Swapping
   ; check if the element is a letter
-    cmp byte [rsi], 65 ; 65 is ASCII value of A
+    cmp byte [rsi], 65 ; This is ASCII value of A
     jl NotALetter
-    cmp byte [rsi], 90 ; 90 is ASCII value of Z
+    cmp byte [rsi], 90 ; This is ASCII value of Z
     jg NotALetter
   ; check if the element is X Y Z
     cmp byte [rsi], 88 ; This is ASCII value of X
@@ -102,13 +93,13 @@ _start:                     ; this is where code starts getting executed
     jmp NextElement
   ; if the element is X
   X:
-    mov byte [rsi], 65 ; change the element X to A
+    mov byte [rsi], 65 ; change the element to A
     jmp NextElement
-  ; else if the element is Y
+  ; if the element is Y
   Y:
     mov byte [rsi], 66 ; change the element to B
     jmp NextElement
-  ; else if the element is Z
+  ; if the element is Z
   Z:
     mov byte [rsi], 67 ; change the element to C
     jmp NextElement
@@ -117,27 +108,23 @@ _start:                     ; this is where code starts getting executed
     mov byte [rsi], 32 ; change the element to space
   ; go to the next element
   NextElement:
-    inc rsi ; increment the pointer -> going to the next charachter
+    inc rsi ; increment the pointer
     jmp ShiftingLoop ; go to the loop
   ; end of loop
   ; swap the elements
   Swapping:
     mov rsi, bufer ; set the pointer to the beginning of the buffer
     ; Swap between the current letter and the next letter
-
     SwapLoop:
     ; check if the end of file use the bufer variable
       cmp byte [rsi+1], NULL
       je EndOfLoop
-      cmp byte [rsi], NULL
-      je EndOfLoop, Null
     ; swap the current letter with the next letter
       mov al, [rsi] ; move the current letter to al
       mov bl, [rsi+1] ; move the next letter to bl
-      mov [rsi], bl ; move bl to the current letter
-      mov [rsi+1], al ; move al to the next letter
-      inc rsi ; increment the pointer
-      jmp SwapLoop
+      mov [rsi], bl ; move the next letter to the current letter
+      mov [rsi+1], al ; move the current letter to the next letter
+    ; go to the next element
   EndOfLoop:
     ; write to STDOUT
     mov rdi, STDOUT ; file descriptor
@@ -165,4 +152,3 @@ _start:                     ; this is where code starts getting executed
     mov rdi, EXIT_SUCCESS ; exit code
     syscall
 
-    

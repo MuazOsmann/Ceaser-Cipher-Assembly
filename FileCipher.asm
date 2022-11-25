@@ -117,7 +117,7 @@ _start:                     ; this is where code starts getting executed
     ; Swap between the current letter and the next letter
     SwapLoop:
     ; check if the end of file use the bufer variable
-      cmp byte [rsi], NULL
+      cmp byte [rsi+1], NULL
       je EndOfLoop
     ; swap the current letter with the next letter
       mov al, [rsi] ; move the current letter to al
@@ -152,4 +152,3 @@ _start:                     ; this is where code starts getting executed
     mov rdi, EXIT_SUCCESS ; exit code
     syscall
 
-    

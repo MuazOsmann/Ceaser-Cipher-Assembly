@@ -29,11 +29,8 @@ section .data
   bufsize dw 1024
   FileName db "msg.txt",0
   ResultFile db "result.txt",0
-<<<<<<< Updated upstream
-=======
   buffer_counter db 0
   LineFeeder db " ",10,0
->>>>>>> Stashed changes
 section .bss
   bufer resb 1024
   CipheredText resb 1024
@@ -156,8 +153,6 @@ _start:                     ; this is where code starts getting executed
     mov rdi, EXIT_SUCCESS ; exit code
     syscall
 
-<<<<<<< Updated upstream
-=======
 ; Create a printing function
 global printString
 printString:
@@ -187,4 +182,3 @@ PrintingDone:
   pop rbx
   pop rbp
   ret
->>>>>>> Stashed changes

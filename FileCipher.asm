@@ -197,7 +197,7 @@ ret
 
 global swap_all
 swap_all:
-    SwapLoop:
+    SwapAllLoop:
     ; check if the end of file
       cmp byte [rsi+1], NULL
       jne .notDoneYet
@@ -209,5 +209,5 @@ swap_all:
       mov [rsi], bl ; move bl to the current letter
       mov [rsi+1], al ; move al to the next letter
       inc rsi
-      jmp SwapLoop
+      jmp SwapAllLoop
 ret

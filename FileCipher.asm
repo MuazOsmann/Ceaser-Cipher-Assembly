@@ -30,11 +30,12 @@ section .data
   FileName db "msg.txt",0
   ResultFile db "result.txt",0
   buffer_counter db 0
+  LineFeeder db " ",10,0
 section .bss
   bufer resb 1024
   CipheredText resb 1024
 section  .text              ; declaring our .text segment
-  global  _start  
+  global  _start
 _start:                     ; this is where code starts getting executed
   ; open the file
     mov rax, SYS_open ; file open
@@ -62,17 +63,14 @@ _start:                     ; this is where code starts getting executed
         ; IF Z SHIFT TO C       Z = 90 TO C = 67
         ; ELSE
         ; SHIFT EVERY ELEMENT BY 3
-        
+
         ; write to STDOUT
-    mov rdi, STDOUT ; file descriptor
-    mov rsi, bufer ; buffer
-    mov rdx, rax ; buffer size
-    mov rax, SYS_write ; write
-    syscall  
+    mov rdi, bufer ; file descriptor
+    call printString
+    syscall
   ; Take Every Letter ASCII value and add 3 to it
   ; if the value is greater than 90 then subtract 26
   ; if the value is less than 65 then add 26
-
   ShiftingLoop:
   ; check if the end of file proceed to the Swapping part
     cmp byte [rsi], NULL
@@ -115,24 +113,19 @@ _start:                     ; this is where code starts getting executed
   ; swap the elements
   Swapping:
     mov rsi, bufer ; set the pointer to the beginning of the buffer
-    ; Swap between the current letter and the next letter
-    SwapLoop:
-    ; check if the end of file use the bufer variable
-      cmp byte [rsi+1], NULL
-      je EndOfLoop
-    ; swap the current letter with the next letter
-      mov al, [rsi] ; move the current letter to al
-      mov bl, [rsi+1] ; move the next letter to bl
-      mov [rsi], bl ; move the next letter to the current letter
-      mov [rsi+1], al ; move the current letter to the next letter
-    ; go to the next element
+    ; Swap between the current letter and the next lettermov rsi, buffer ; set the pointer to the beginning of the buffer
+    call swap ; calling the swap function to swap between paramteres
+
   EndOfLoop:
+    ; Line Feed
+    mov rdi, LineFeeder
+    call printString
+
     ; write to STDOUT
-    mov rdi, STDOUT ; file descriptor
-    mov rsi, bufer ; buffer
-    mov rdx, rax ; buffer size
-    mov rax, SYS_write ; write
+    mov rdi, bufer ; file descriptor
+    call printString
     syscall
+
   ; open the file
     mov rax, SYS_open ; file open
     mov rdi, ResultFile ; file name string
@@ -153,4 +146,49 @@ _start:                     ; this is where code starts getting executed
     mov rdi, EXIT_SUCCESS ; exit code
     syscall
 
+; Create a printing function
+global printString
+printString:
+  push rbp
+  mov rbp, rsp
+  push rbx
+  ; Count characters in string.
+  mov rbx, rdi
+  mov rdx, NULL
+CountingLoop:
+  cmp byte [rbx], NULL
+  ; if the character is NULL then exit the current loop
+  je CountingDone
+  inc rbx
+  inc rdx
+  jmp CountingLoop
+CountingDone:
+  ;if rdx is 0, then return the value
+  cmp rdx, NULL
+  je PrintingDone
+  mov rax, SYS_write ; code for system writing
+  mov rsi, rdi ; address of the string
+  mov rdi, STDOUT ; file descriptor
+  syscall ; system call
+; String Printed
+PrintingDone:
+  pop rbx
+  pop rbp
+  ret
 
+global swap
+swap:
+    SwapLoop:
+    ; check if the end of file
+      cmp byte [rsi+1], NULL
+      jne .notDone
+      ret
+    .notDone:
+    ; swap the current letter with the next letter
+      mov al, [rsi] ; move the current letter to al
+      mov bl, [rsi+1] ; move the next letter to bl
+      mov [rsi], bl ; move bl to the current letter
+      mov [rsi+1], al ; move al to the next letter
+      inc rsi ; increment the pointer
+      jmp SwapLoop
+ret

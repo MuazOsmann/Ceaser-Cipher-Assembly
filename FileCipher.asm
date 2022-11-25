@@ -29,6 +29,7 @@ section .data
   bufsize dw 1024
   FileName db "msg.txt",0
   ResultFile db "result.txt",0
+  buffer_counter db 0
 section .bss
   bufer resb 1024
   CipheredText resb 1024
@@ -151,4 +152,5 @@ _start:                     ; this is where code starts getting executed
     mov rax, SYS_exit ; exit
     mov rdi, EXIT_SUCCESS ; exit code
     syscall
+
 

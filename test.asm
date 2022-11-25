@@ -4,7 +4,6 @@
     mov rdi, rsi    ; gives rsi as argument/parameter to function swap
     call swap
 
-
 global swap
 swap:
     SwapLoop:
@@ -21,3 +20,16 @@ swap:
       inc rsi ; increment the pointer
       jmp SwapLoop
 ret
+
+
+mov rsi, buffer
+global lengthCounter
+lengthCounter:
+    cmp byte [rsi], NULL
+    je endOfCounter
+    inc buffer_counter
+    inc rsi
+    jmp lengthCounter
+
+    endOfCounter:
+        ret

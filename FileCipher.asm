@@ -40,7 +40,7 @@ _start:                     ; this is where code starts getting executed
   ; open the file
     mov rax, SYS_open ; file open
     mov rdi, FileName ; file name string
-    mov rsi, O_RDWR
+    mov rsi, O_RDWR   ; READ WRITE PERMISSIONS
     mov rdx, 0
     syscall
 
@@ -51,26 +51,27 @@ _start:                     ; this is where code starts getting executed
     mov rax, SYS_read ; read
     syscall
 
-   ; CIPHER CODE
-        ; TRAVERSE THE CONTENT OF THE FILE
-        ; FIRST CHECK IF END OF FILE
-        ; CHECK IF ELEMENT IS A LETTER -> RANGE OF LETTERS IN ASSCI
-        ; CAPITAL LETTERS RANGE A (65) TO Z (90)
-        ; USING ASCI
-        ; WE CHECK IF X Y Z
-        ; IF X SHIFT TO A       X = 88 TO A = 65
-        ; IF Y SHIFT TO B       Y = 89 TO B = 66
-        ; IF Z SHIFT TO C       Z = 90 TO C = 67
-        ; ELSE
-        ; SHIFT EVERY ELEMENT BY 3
 
         ; write to STDOUT
-    mov rdi, bufer ; file descriptor
+    mov rdi, bufer ; PRINTING CONTENT OF FILE - file descriptor
     call printString
     syscall
-  ; Take Every Letter ASCII value and add 3 to it
-  ; if the value is greater than 90 then subtract 26
-  ; if the value is less than 65 then add 26
+
+     ; CIPHER CODE
+          ; TRAVERSE THE CONTENT OF THE FILE
+          ; FIRST CHECK IF END OF FILE
+          ; CHECK IF ELEMENT IS A LETTER -> RANGE OF LETTERS IN ASSCI
+          ; CAPITAL LETTERS RANGE A (65) TO Z (90)
+          ; USING ASCI
+          ; WE CHECK IF X Y Z
+          ; IF X SHIFT TO A       X = 88 TO A = 65
+          ; IF Y SHIFT TO B       Y = 89 TO B = 66
+          ; IF Z SHIFT TO C       Z = 90 TO C = 67
+          ; ELSE
+          ; SHIFT EVERY ELEMENT BY 3
+            ; Take Every Letter ASCII value and add 3 to it
+            ; if the value is greater than 90 then subtract 26
+            ; if the value is less than 65 then add 26
   ShiftingLoop:
   ; check if the end of file proceed to the Swapping part
     cmp byte [rsi], NULL
@@ -199,9 +200,9 @@ swap_all:
     SwapLoop:
     ; check if the end of file
       cmp byte [rsi+1], NULL
-      jne .notDone
+      jne .notDoneYet
       ret
-    .notDone:
+    .notDoneYet:
     ; swap the current letter with the next letter
       mov al, [rsi] ; move the current letter to al
       mov bl, [rsi+1] ; move the next letter to bl

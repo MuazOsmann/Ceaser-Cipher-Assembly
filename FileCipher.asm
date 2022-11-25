@@ -31,6 +31,7 @@ section .data
   ResultFile db "result.txt",0
 section .bss
   bufer resb 1024
+  CipheredText resb 1024
 section  .text              ; declaring our .text segment
   global  _start  
 _start:                     ; this is where code starts getting executed
@@ -70,10 +71,11 @@ _start:                     ; this is where code starts getting executed
   ; Take Every Letter ASCII value and add 3 to it
   ; if the value is greater than 90 then subtract 26
   ; if the value is less than 65 then add 26
+
   ShiftingLoop:
-  ; check if the end of file
+  ; check if the end of file proceed to the Swapping part
     cmp byte [rsi], NULL
-    je EndOfLoop
+    je Swapping
   ; check if the element is a letter
     cmp byte [rsi], 65 ; This is ASCII value of A
     jl NotALetter
@@ -109,6 +111,21 @@ _start:                     ; this is where code starts getting executed
     inc rsi ; increment the pointer
     jmp ShiftingLoop ; go to the loop
   ; end of loop
+  ; swap the elements
+  Swapping:
+    mov rsi, bufer ; set the pointer to the beginning of the buffer
+    ; Swap between the current letter and the next letter
+    SwapLoop:
+    ; check if the end of file
+      cmp byte [rsi], NULL
+      je EndOfLoop
+    ; swap the current letter with the next letter
+      mov al, [rsi] ; move the current letter to al
+      mov bl, [rsi+1] ; move the next letter to bl
+      mov [rsi], bl ; move bl to the current letter
+      mov [rsi+1], al ; move al to the next letter
+      inc rsi ; increment the pointer
+      jmp SwapLoop
   EndOfLoop:
     ; write to STDOUT
     mov rdi, STDOUT ; file descriptor

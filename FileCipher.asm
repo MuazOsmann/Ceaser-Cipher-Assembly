@@ -75,18 +75,31 @@ _start:                     ; this is where code starts getting executed
   ; check if the end of file proceed to the Swapping part
     cmp byte [rsi], NULL
     je Swapping
+      ; check if the element is X Y Z
+        cmp byte [rsi], 88      ; This is ASCII value of X
+        je X
+        cmp byte [rsi], 89      ; This is ASCII value of Y
+        je Y
+        cmp byte [rsi], 90      ; This is ASCII value of Z
+        je Z
+     ; Check if the element is x y z
+        cmp byte [rsi], 120     ; This is ASCII value of x
+        je x
+        cmp byte [rsi], 121     ; This is ASCII value of y
+        je y
+        cmp byte [rsi],122      ; This is ASCII value of z
+        je z
   ; check if the element is a letter
     cmp byte [rsi], 65 ; This is ASCII value of A
     jl NotALetter
     cmp byte [rsi], 90 ; This is ASCII value of Z
-    jg NotALetter
-  ; check if the element is X Y Z
-    cmp byte [rsi], 88 ; This is ASCII value of X
-    je X
-    cmp byte [rsi], 89 ; This is ASCII value of Y
-    je Y
-    cmp byte [rsi], 90 ; This is ASCII value of Z
-    je Z
+    jle shift
+    cmp byte [rsi], 97 ; This is ASCII value of Z
+    jl NotALetter
+    cmp byte [rsi], 122 ; This is ASCII value of Z
+    jle shift
+
+  shift:
   ; else shift the element by 3
     add byte [rsi], 3 ; add 3 to the element
     jmp NextElement
@@ -102,6 +115,19 @@ _start:                     ; this is where code starts getting executed
   Z:
     mov byte [rsi], 67 ; change the element to C
     jmp NextElement
+  ; if the element is x
+  x:
+      mov byte [rsi],  97; change the element to a
+      jmp NextElement
+  ; if the element is y
+  y:
+      mov byte [rsi], 98 ; change the element to b
+      jmp NextElement
+  ; if the element is z
+  z:
+      mov byte [rsi], 99 ; change the element to c
+      jmp NextElement
+
   ; if the element is not a letter
   NotALetter:
     mov byte [rsi], 32 ; change the element to space

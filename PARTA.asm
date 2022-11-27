@@ -21,7 +21,8 @@ O_TRUNC equ 0x200
 O_RDONLY equ 000000q ; read only
 O_WRONLY equ 000001q ; write only
 O_RDWR equ 000002q ; read and write
-
+S_IRUSR equ 00400q
+S_IWUSR equ 00200q
 section .data
   bufsize dw 1024   ; number of characters, each character has a word (2 bytes) woth of memory specified for it
   FileName db "msg.txt",0   ; name of the source file - the file that includes the text to be ciphered

@@ -22,6 +22,8 @@ O_TRUNC equ 0x200
 O_RDONLY equ 000000q ; read only
 O_WRONLY equ 000001q ; write only
 O_RDWR equ 000002q ; read and write
+S_IRUSR equ 00400q
+S_IWUSR equ 00200q
 
 section .data
   bufsize dw 1024
@@ -42,7 +44,7 @@ _start:                     ; this is where code starts getting executed
     syscall
   ; check if the file is opened successfully
     cmp rax, 0
-    jl error
+    jl FileOpenError
 
   ; read the file
     mov rdi, rax ; file descriptor

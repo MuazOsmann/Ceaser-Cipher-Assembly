@@ -23,14 +23,14 @@ O_WRONLY equ 000001q ; write only
 O_RDWR equ 000002q ; read and write
 
 section .data
-  bufsize dw 1024
-  FileName db "msg.txt",0
-  ResultFile db "result.txt",0
-  FileOpenErrorMsg db "Error: File could not be opened",10,0
-  LineFeeder db " ",10,0
+  bufsize dw 1024   ; number of characters, each character has a word (2 bytes) woth of memory specified for it
+  FileName db "msg.txt",0   ; name of the source file - the file that includes the text to be ciphered
+  ResultFile db "result.txt",0  ; name of the file where the ciphered text will be stored in
+  FileOpenErrorMsg db "Error: File could not be opened",10,0    ; ERROR MESSAGE that will be displayed if any error occures when handling files
+  LineFeeder db " ",10,0   ; The Line Feed
 
 section .bss
-  bufer resb 1024
+  bufer resb 1024       ; reserved memory for where to store the extracted content, such that it would be manipulated later
 
 section  .text              ; declaring our .text segment
   global  _start
@@ -41,9 +41,9 @@ _start:                     ; this is where code starts getting executed
     mov rsi, O_RDWR   ; READ WRITE PERMISSIONS
     mov rdx, 0
     syscall
-
+    ; output will be stored in rax, so we will compare to rax to handle errors
     ;Check if the File opened Successfuly
-    cmp rax, 0
+    cmp rax, 0      ; if a negative values is in rax, it would mean that an error has occured when the file was opened
     jl FileOpenError
     
   ; read the file
@@ -54,7 +54,7 @@ _start:                     ; this is where code starts getting executed
     syscall
 
 
-        ; write to STDOUT
+        ; write to STDOUT/SCREEN
     mov rdi, bufer ; PRINTING CONTENT OF FILE - file descriptor
     call printString
     syscall
@@ -75,10 +75,11 @@ _start:                     ; this is where code starts getting executed
             ; if the value is greater than 90 then subtract 26
             ; if the value is less than 65 then add 26
   ShiftingLoop:
-  ; check if the end of file proceed to the Swapping part
+  ; Check if the end of file by checking if current character is NULL, if true proceed to the Swapping part
+  ; NOTE: rsi holds the current character - rsi gets increamented later on such that we could traverse the array of chars
     cmp byte [rsi], NULL
-    je Swapping
-  ; check if the element is a letter
+    je Swapping     ; equavilant to if (rsi == NULL) { Jump to Swapping }
+  ; check if the element is a letter by checking if it's withen the interval of the ASSCI NUMBER OS CAPITAL LETTERS
     cmp byte [rsi], 65 ; This is ASCII value of A
     jl NotALetter
     cmp byte [rsi], 90 ; This is ASCII value of Z
@@ -121,7 +122,7 @@ _start:                     ; this is where code starts getting executed
 
   EndOfLoop:
     ; Line Feed
-    mov rdi, LineFeeder
+    mov rdi, LineFeeder ; adds a line
     call printString
 
     ; write to STDOUT
@@ -152,7 +153,7 @@ _start:                     ; this is where code starts getting executed
     mov rax, SYS_exit ; exit
     mov rdi, EXIT_SUCCESS ; exit code
     syscall
-
+; Used to print on the screen any errors that may result when opening files
 FileOpenError:
     mov rdi, FileOpenErrorMsg
     call printString
@@ -190,13 +191,14 @@ PrintingDone:
   pop rbp ; pop the value of rbp
   ret ; return the value
 
+; Function to Swap the odd characters with the even character for example abcd -> badc
 global odd_even_swap
 odd_even_swap:
     SwapLoop:
-    ; check if the end of file
-      cmp byte [rsi+1], NULL
+    ; check if the end of array
+      cmp byte [rsi+1], NULL    ; if not the end of the array then keep on swapping
       jne .notDone
-      ret
+      ret   ; used to stop the function, then return to where the function was called: where function is stored is in rip register
     .notDone:
     ; swap the current letter with the next letter
       mov al, [rsi] ; move the current letter to al
@@ -204,6 +206,6 @@ odd_even_swap:
       mov [rsi], bl ; move bl to the current letter
       mov [rsi+1], al ; move al to the next letter
       add rsi, 2 ; increment the pointer by 2
-      jmp SwapLoop
+      jmp SwapLoop  ; continue swapping
 ret
 

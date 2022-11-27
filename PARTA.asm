@@ -1,3 +1,9 @@
+;Group Members:
+; Muaz Osman
+; Waseem Qaffaf
+; Kassem Darawcha
+; Munir Alremawi
+
 ;Defining the Constants
 LF equ 10 ; line feed
 NULL equ 0 ; end of string
@@ -25,7 +31,7 @@ section .data
 
 section .bss
   bufer resb 1024
-  
+
 section  .text              ; declaring our .text segment
   global  _start
 _start:                     ; this is where code starts getting executed
@@ -126,8 +132,12 @@ _start:                     ; this is where code starts getting executed
   ; open the file
     mov rax, SYS_open ; file open
     mov rdi, ResultFile ; file name string
-    mov rsi, O_CREAT | O_TRUNC | O_WRONLY ; flags
-    mov rdx, S_IRUSR | S_IWUSR ; mode
+    mov rsi, O_CREAT | O_TRUNC | O_WRONLY ; O_CREAT : create the file if it does not exist
+                                          ; O_TRUNC : truncate the file to zero length
+                                          ; O_WRONLY : open for writing only
+    mov rdx, S_IRUSR | S_IWUSR ; mode of the file -> 
+                               ;S_IRUSR : read permission for the owner
+                               ; S_IWUSR : write permission for the owner
     syscall
   ; write to the file
     mov rdi, rax ; file descriptor
@@ -153,32 +163,32 @@ FileOpenError:
 ; Create a printing function
 global printString
 printString:
-  push rbp
-  mov rbp, rsp
-  push rbx
+  push rbp ; save the base pointer
+  mov rbp, rsp ; set the base pointer to the stack pointer
+  push rbx ; save the base pointer
   ; Count characters in string.
-  mov rbx, rdi
-  mov rdx, NULL
-CountingLoop:
-  cmp byte [rbx], NULL
+  mov rbx, rdi ; save the pointer to the string
+  mov rdx, NULL ; save the end of string
+CountingLoop: 
+  cmp byte [rbx], NULL ; check if the end of string
   ; if the character is NULL then exit the current loop
-  je CountingDone
-  inc rbx
-  inc rdx
-  jmp CountingLoop
+  je CountingDone ; exit the loop
+  inc rbx ; increment the pointer
+  inc rdx ; increment the counter
+  jmp CountingLoop ; go to the loop
 CountingDone:
   ;if rdx is 0, then return the value
-  cmp rdx, NULL
-  je PrintingDone
+  cmp rdx, NULL ; if rdx is 0, then return the value
+  je PrintingDone ; if rdx is 0, then return the value
   mov rax, SYS_write ; code for system writing
   mov rsi, rdi ; address of the string
   mov rdi, STDOUT ; file descriptor
   syscall ; system call
 ; String Printed
 PrintingDone:
-  pop rbx
-  pop rbp
-  ret
+  pop rbx ; pop the value of rbx
+  pop rbp ; pop the value of rbp
+  ret ; return the value
 
 global odd_even_swap
 odd_even_swap:

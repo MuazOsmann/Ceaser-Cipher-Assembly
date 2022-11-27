@@ -1,8 +1,13 @@
+;Group Members:
+; Muaz Osman
+; Waseem Qaffaf
+; Kassem Darawcha
+; Munir Alremawi
+
+
 ;Defining the Constants
 LF equ 10 ; line feed
 NULL equ 0 ; end of string
-TRUE equ 1
-FALSE equ 0
 EXIT_SUCCESS equ 0 ; success code
 STDIN equ 0 ; standard input
 STDOUT equ 1 ; standard output
@@ -11,30 +16,21 @@ SYS_read equ 0 ; read
 SYS_write equ 1 ; write
 SYS_open equ 2 ; file open
 SYS_close equ 3 ; file close
-SYS_fork equ 57 ; fork
 SYS_exit equ 60 ; terminate
-SYS_creat equ 85 ; file open/create
-SYS_time equ 201 ; get time
 O_CREAT equ 0x40
 O_TRUNC equ 0x200
-O_APPEND equ 0x400
 O_RDONLY equ 000000q ; read only
 O_WRONLY equ 000001q ; write only
 O_RDWR equ 000002q ; read and write
-S_IRUSR equ 00400q
-S_IWUSR equ 00200q
-S_IXUSR equ 00100q
 
 section .data
   bufsize dw 1024
   FileName db "msg.txt",0
   ResultFile db "result.txt",0
-  buffer_counter db 0
-  LineFeeder db " ",10,0
   FileOpenErrorMsg db "Error: File could not be opened",10,0
+  LineFeeder db " ",10,0
 section .bss
   bufer resb 1024
-  CipheredText resb 1024
 section  .text              ; declaring our .text segment
   global  _start
 _start:                     ; this is where code starts getting executed
@@ -136,7 +132,9 @@ _start:                     ; this is where code starts getting executed
   ; open the file
     mov rax, SYS_open ; file open
     mov rdi, ResultFile ; file name string
-    mov rsi, O_CREAT | O_TRUNC | O_WRONLY ; flags
+    mov rsi, O_CREAT | O_TRUNC | O_WRONLY ; O_CREAT : create the file if it does not exist
+                                          ; O_TRUNC : truncate the file to zero length
+                                          ; O_WRONLY : open for writing only
     mov rdx, S_IRUSR | S_IWUSR ; mode
     syscall
   ; write to the file
@@ -154,47 +152,47 @@ _start:                     ; this is where code starts getting executed
     syscall
 
 FileOpenError:
-    mov rdi, FileOpenErrorMsg
-    call printString
-    syscall
+    mov rdi, FileOpenErrorMsg ; file open error message
+    call printString ; print the error message
+    syscall ; system call
     mov rax, SYS_exit ; exit
     mov rdi, EXIT_SUCCESS ; exit code
-    syscall
+    syscall ; system call
 ; Create a printing function
 global printString
 printString:
-  push rbp
-  mov rbp, rsp
-  push rbx
+  push rbp ; save the base pointer
+  mov rbp, rsp ; set the base pointer to the stack pointer
+  push rbx ; save the base pointer
   ; Count characters in string.
-  mov rbx, rdi
-  mov rdx, NULL
+  mov rbx, rdi ; save the string pointer
+  mov rdx, NULL ; set the end of string character
 CountingLoop:
-  cmp byte [rbx], NULL
+  cmp byte [rbx], NULL ; check if the end of string
   ; if the character is NULL then exit the current loop
-  je CountingDone
-  inc rbx
-  inc rdx
-  jmp CountingLoop
+  je CountingDone ; exit the loop if the character is NULL
+  inc rbx ; increment the pointer
+  inc rdx ; increment the counter
+  jmp CountingLoop ; go to the loop
 CountingDone:
   ;if rdx is 0, then return the value
-  cmp rdx, NULL
-  je PrintingDone
+  cmp rdx, NULL ; check if the counter is 0 or not
+  je PrintingDone ; if the counter is 0 then exit the function
   mov rax, SYS_write ; code for system writing
   mov rsi, rdi ; address of the string
   mov rdi, STDOUT ; file descriptor
   syscall ; system call
 ; String Printed
 PrintingDone:
-  pop rbx
-  pop rbp
-  ret
+  pop rbx ; restore the base pointer
+  pop rbp ; restore the base pointer
+  ret ; return to the caller
 
 global odd_even_swap
 odd_even_swap:
     SwapLoop:
     ; check if the end of file
-      cmp byte [rsi+1], NULL
+      cmp byte [rsi+1], NULL 
       jne .notDone
       ret
     .notDone:

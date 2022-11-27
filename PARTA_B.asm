@@ -31,6 +31,7 @@ section .data
   ResultFile db "result.txt",0
   buffer_counter db 0
   LineFeeder db " ",10,0
+  FileOpenErrorMsg db "Error: File could not be opened",10,0
 section .bss
   bufer resb 1024
   CipheredText resb 1024
@@ -43,6 +44,9 @@ _start:                     ; this is where code starts getting executed
     mov rsi, O_RDWR   ; READ WRITE PERMISSIONS
     mov rdx, 0
     syscall
+  ; check if the file is opened successfully
+    cmp rax, 0
+    jl error
 
   ; read the file
     mov rdi, rax ; file descriptor
@@ -149,6 +153,13 @@ _start:                     ; this is where code starts getting executed
     mov rdi, EXIT_SUCCESS ; exit code
     syscall
 
+FileOpenError:
+    mov rdi, FileOpenErrorMsg
+    call printString
+    syscall
+    mov rax, SYS_exit ; exit
+    mov rdi, EXIT_SUCCESS ; exit code
+    syscall
 ; Create a printing function
 global printString
 printString:

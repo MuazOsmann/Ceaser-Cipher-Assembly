@@ -1,8 +1,6 @@
 ;Defining the Constants
 LF equ 10 ; line feed
 NULL equ 0 ; end of string
-TRUE equ 1
-FALSE equ 0
 EXIT_SUCCESS equ 0 ; success code
 STDIN equ 0 ; standard input
 STDOUT equ 1 ; standard output
@@ -11,29 +9,23 @@ SYS_read equ 0 ; read
 SYS_write equ 1 ; write
 SYS_open equ 2 ; file open
 SYS_close equ 3 ; file close
-SYS_fork equ 57 ; fork
 SYS_exit equ 60 ; terminate
-SYS_creat equ 85 ; file open/create
-SYS_time equ 201 ; get time
 O_CREAT equ 0x40
 O_TRUNC equ 0x200
-O_APPEND equ 0x400
 O_RDONLY equ 000000q ; read only
 O_WRONLY equ 000001q ; write only
 O_RDWR equ 000002q ; read and write
-S_IRUSR equ 00400q
-S_IWUSR equ 00200q
-S_IXUSR equ 00100q
 
 section .data
   bufsize dw 1024
   FileName db "msg.txt",0
   ResultFile db "result.txt",0
-  buffer_counter db 0
+  FileOpenErrorMsg db "Error: File could not be opened",10,0
   LineFeeder db " ",10,0
+
 section .bss
   bufer resb 1024
-  CipheredText resb 1024
+  
 section  .text              ; declaring our .text segment
   global  _start
 _start:                     ; this is where code starts getting executed
@@ -44,6 +36,10 @@ _start:                     ; this is where code starts getting executed
     mov rdx, 0
     syscall
 
+    ;Check if the File opened Successfuly
+    cmp rax, 0
+    jl FileOpenError
+    
   ; read the file
     mov rdi, rax ; file descriptor
     mov rsi, bufer ; buffer
@@ -147,6 +143,13 @@ _start:                     ; this is where code starts getting executed
     mov rdi, EXIT_SUCCESS ; exit code
     syscall
 
+FileOpenError:
+    mov rdi, FileOpenErrorMsg
+    call printString
+    syscall
+    mov rax, SYS_exit ; exit
+    mov rdi, EXIT_SUCCESS ; exit code
+    syscall
 ; Create a printing function
 global printString
 printString:

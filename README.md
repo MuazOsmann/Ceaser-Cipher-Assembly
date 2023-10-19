@@ -51,3 +51,6 @@ Check if the file opened successfully by comparing the value of rax with 0. If r
 Read the file with SYS_read syscall. The file descriptor is stored in rdi, the buffer in rsi, and the buffer size in rdx.
 Write to the standard output with SYS_write syscall. The content of the file is stored in bufer.
 Shift the content of the file by adding 3 to each letter's ASCII value. If the value is greater than 90, subtract 26
+
+
+WE retain all rights to OUR source code and no one may reproduce, distribute, or create derivative works from the work found in this repository.
